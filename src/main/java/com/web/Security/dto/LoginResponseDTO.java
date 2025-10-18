@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class LoginResponseDTO {
 
     private String jwtToken;
-    private String id;
+    private Long id;
 
 }
