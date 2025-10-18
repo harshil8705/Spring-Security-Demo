@@ -6,7 +6,6 @@ import com.web.Security.dto.SignupRequestDTO;
 import com.web.Security.dto.SignupResponseDTO;
 import com.web.Security.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +28,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<SignupResponseDTO> userSignUp(@RequestBody SignupRequestDTO signupRequestDTO) {
+    public ResponseEntity<SignupResponseDTO> userSignUp(@RequestBody SignupRequestDTO signupRequestDTO) throws IllegalAccessException {
 
         return new ResponseEntity<>(authService.userSignup(signupRequestDTO), HttpStatus.OK);
 
