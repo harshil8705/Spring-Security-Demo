@@ -29,7 +29,6 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String email;
 
-    @Length(max = 50, min = 1)
     private String password;
 
     @Override
