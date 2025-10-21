@@ -1,7 +1,9 @@
 package com.web.Security.configuration;
 
 import com.web.Security.filter.JwtAuthFilter;
+import com.web.Security.util.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,11 +16,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class WebSecurityConfiguration {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -29,13 +33,16 @@ public class WebSecurityConfiguration {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/public/**", "/auth/**").permitAll()
-//                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-//                        .requestMatchers("/api/trainer/**").hasAnyRole("TRAINER", "ADMIN")
-//                        .requestMatchers("/api/user/**").hasAnyRole("USER", "TRAINER", "ADMIN")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-//                .formLogin(Customizer.withDefaults());
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(oauth ->
+                        oauth
+                                .failureHandler((request, response, exception) ->
+                                        log.error("OAuth2 error: {}", exception.getMessage())
+                        )
+                                .successHandler(oAuth2SuccessHandler)
+                );
         return httpSecurity.build();
     }
 
