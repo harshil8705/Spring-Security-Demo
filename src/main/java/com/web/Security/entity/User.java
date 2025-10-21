@@ -1,5 +1,6 @@
 package com.web.Security.entity;
 
+import com.web.Security.type.AuthProviderType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -30,6 +31,11 @@ public class User implements UserDetails {
     private String email;
 
     private String password;
+
+    private String providerId;
+
+    @Enumerated(EnumType.STRING)
+    private AuthProviderType providerType;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
