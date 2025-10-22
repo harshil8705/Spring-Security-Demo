@@ -23,7 +23,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfiguration {
 
     private final JwtAuthFilter jwtAuthFilter;
-    @Lazy
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean

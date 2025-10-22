@@ -10,13 +10,11 @@ import com.web.Security.type.AuthProviderType;
 import com.web.Security.util.AuthUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -26,7 +24,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
-    @Lazy
     private final AuthenticationManager authenticationManager;
     private final AuthUtil authUtil;
     private final UserRepository userRepository;
@@ -49,7 +46,7 @@ public class AuthService {
 
     }
 
-    public User signup(SignupRequestDTO signupRequestDTO) throws IllegalAccessException {
+    public User signup(SignupRequestDTO signupRequestDTO, AuthProviderType authProviderType, String providerId) throws IllegalAccessException {
 
         User user = userRepository.findByUsername(signupRequestDTO.getUsername())
                 .orElse(null);
@@ -58,17 +55,25 @@ public class AuthService {
             throw new IllegalAccessException("User with username: " + user.getUsername() + " already exists!!");
         }
 
-        return userRepository.save(User.builder()
+        user = User.builder()
                 .username(signupRequestDTO.getUsername())
-                .password(passwordEncoder.encode(signupRequestDTO.getPassword()))
-                .build()
-        );
+                .providerId(providerId)
+                .providerType(authProviderType)
+                .build();
+
+        if (authProviderType == AuthProviderType.EMAIL) {
+
+            user.setPassword(passwordEncoder.encode(signupRequestDTO.getPassword()));
+
+        }
+
+        return userRepository.save(user);
 
     }
 
     public SignupResponseDTO userSignup(SignupRequestDTO signupRequestDTO) throws IllegalAccessException {
 
-        User user = signup(signupRequestDTO);
+        User user = signup(signupRequestDTO, AuthProviderType.EMAIL, null);
         return new SignupResponseDTO(user.getId(), user.getUsername());
 
     }
@@ -85,7 +90,7 @@ public class AuthService {
 
         if (user == null && emailUser == null) {
             String username = authUtil.determineUsernameFromOAuth2User(oAuth2User, registrationId, providerId);
-            user = signup(new SignupRequestDTO(username, null));
+            user = signup(new SignupRequestDTO(username, null), providerType, providerId);
         } else if (user != null) {
             if (email != null && !email.isBlank() && !email.equals(user.getUsername())) {
                 user.setUsername(email);

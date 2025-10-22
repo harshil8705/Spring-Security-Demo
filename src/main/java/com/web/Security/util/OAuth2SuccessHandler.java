@@ -22,7 +22,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
-    @Lazy
     private final AuthService authService;
     private final ObjectMapper objectMapper;
 
@@ -34,14 +33,17 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         String registrationId = token.getAuthorizedClientRegistrationId();
 
+        ResponseEntity<LoginResponseDTO> loginResponse = null;
         try {
-            ResponseEntity<LoginResponseDTO> loginResponse = authService.handleOAuth2LoginRequest(oAuth2User, registrationId);
-            response.setStatus(loginResponse.getStatusCode().value());
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.getWriter().write(objectMapper.writeValueAsString(loginResponse.getBody()));
+            loginResponse = authService.handleOAuth2LoginRequest(oAuth2User,
+                    registrationId);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
+
+        response.setStatus(loginResponse.getStatusCode().value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter().write(objectMapper.writeValueAsString(loginResponse.getBody()));
 
     }
 }

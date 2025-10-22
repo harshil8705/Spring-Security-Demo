@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-    @Lazy
     private final AuthService authService;
 
     @PostMapping("/login")
