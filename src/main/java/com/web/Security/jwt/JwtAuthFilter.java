@@ -1,4 +1,4 @@
-package com.web.Security.filter;
+package com.web.Security.jwt;
 
 import com.web.Security.entity.User;
 import com.web.Security.repository.UserRepository;

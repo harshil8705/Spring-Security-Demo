@@ -26,10 +26,6 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String username;
 
-    @Email
-    @Column(unique = true)
-    private String email;
-
     private String password;
 
     private String providerId;

@@ -1,11 +1,12 @@
 package com.web.Security.configuration;
 
-import com.web.Security.filter.JwtAuthFilter;
+import com.web.Security.jwt.JwtAuthFilter;
 import com.web.Security.util.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfiguration {
 
     private final JwtAuthFilter jwtAuthFilter;
+    @Lazy
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean

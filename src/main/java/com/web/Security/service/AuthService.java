@@ -10,11 +10,13 @@ import com.web.Security.type.AuthProviderType;
 import com.web.Security.util.AuthUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -24,15 +26,19 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
+    @Lazy
     private final AuthenticationManager authenticationManager;
     private final AuthUtil authUtil;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public LoginResponseDTO userLogin(LoginRequestDTO loginRequestDTO) {
+    public LoginResponseDTO userLogin(LoginRequestDTO loginRequestDTO) throws Exception {
 
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(loginRequestDTO.getUsername(), loginRequestDTO.getPassword())
+            new UsernamePasswordAuthenticationToken(
+                    loginRequestDTO.getUsername(),
+                    loginRequestDTO.getPassword()
+            )
         );
 
         User user = (User) authentication.getPrincipal();
@@ -54,7 +60,6 @@ public class AuthService {
 
         return userRepository.save(User.builder()
                 .username(signupRequestDTO.getUsername())
-                .email(signupRequestDTO.getEmail())
                 .password(passwordEncoder.encode(signupRequestDTO.getPassword()))
                 .build()
         );
@@ -80,7 +85,7 @@ public class AuthService {
 
         if (user == null && emailUser == null) {
             String username = authUtil.determineUsernameFromOAuth2User(oAuth2User, registrationId, providerId);
-            user = signup(new SignupRequestDTO(username, null, null));
+            user = signup(new SignupRequestDTO(username, null));
         } else if (user != null) {
             if (email != null && !email.isBlank() && !email.equals(user.getUsername())) {
                 user.setUsername(email);

@@ -6,6 +6,7 @@ import com.web.Security.dto.SignupRequestDTO;
 import com.web.Security.dto.SignupResponseDTO;
 import com.web.Security.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,10 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
+    @Lazy
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> userLogin(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<LoginResponseDTO> userLogin(@RequestBody LoginRequestDTO loginRequestDTO) throws Exception {
 
         return new ResponseEntity<>(authService.userLogin(loginRequestDTO), HttpStatus.OK);
 
